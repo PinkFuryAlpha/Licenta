@@ -1,7 +1,7 @@
 package com.music.app.service;
 
 import com.music.app.entity.User;
-import com.music.app.entity.token.VerificationToken;
+import com.music.app.config.tokens.VerificationToken;
 
 public interface VerificationTokenService {
 

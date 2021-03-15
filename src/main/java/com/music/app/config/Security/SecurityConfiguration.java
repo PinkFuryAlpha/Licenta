@@ -1,10 +1,15 @@
-package com.music.app.config;
+package com.music.app.config.Security;
 
+import com.music.app.config.JwtAuthenticationEntryPoint;
+import com.music.app.config.JwtFilter;
 import com.music.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -13,7 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -22,11 +28,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String BASIC_USER_ROLE = "BASIC_USER";
 
-    //private final UserDetailsService userDetailsService;
-    //private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -42,8 +51,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
+        //.parentAuthenticationManager(authenticationManagerBean())
     }
 
     @Override
@@ -52,16 +68,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http
-                 //.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/register/**").permitAll()
-                .antMatchers("/users/me").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
+                .antMatchers(HttpMethod.POST, "/register/**","/users/login").permitAll()
+                .antMatchers(HttpMethod.GET).hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
 
                 .anyRequest()
                 .authenticated()
                 .and()
                 .formLogin().disable()
-                .httpBasic();
-        ;
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
+
+
     }
+
 }

@@ -1,13 +1,12 @@
 package com.music.app.service;
 
 import com.music.app.entity.User;
-import com.music.app.entity.token.VerificationToken;
+import com.music.app.config.tokens.VerificationToken;
 import com.music.app.repo.VerificationTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 //String token = UUID.randomUUID().toString();
 @Service

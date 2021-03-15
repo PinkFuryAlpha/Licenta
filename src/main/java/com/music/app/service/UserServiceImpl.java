@@ -2,17 +2,20 @@ package com.music.app.service;
 
 import com.music.app.config.EmailConfiguration;
 import com.music.app.config.exception.BusinessException;
+import com.music.app.config.tokens.JWT;
+import com.music.app.dto.UserLoginDTO;
 import com.music.app.dto.UserRegisterDTO;
 import com.music.app.entity.Role;
 import com.music.app.entity.User;
-import com.music.app.entity.token.VerificationToken;
+import com.music.app.config.tokens.VerificationToken;
 import com.music.app.repo.RoleRepo;
 import com.music.app.repo.UserRepo;
-import com.music.app.repo.VerificationTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,10 +23,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +45,41 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private JWT jwtToken;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Override
+    public String login(UserLoginDTO userLoginDTO) throws BusinessException {
+
+        if (Objects.isNull(userLoginDTO)) {
+            throw new BusinessException(401, "Body null !");
+        }
+
+        if (Objects.isNull(userLoginDTO.getUsername())) {
+            throw new BusinessException(400, "Username can't be null ! ");
+        }
+
+        if (Objects.isNull(userLoginDTO.getPassword())) {
+            throw new BusinessException(400, "Password can't be null !");
+        }
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername(), userLoginDTO.getPassword())
+            );
+        } catch (BadCredentialsException e){
+            throw new BusinessException(401,"Bad credentials!");
+        }
+
+        final UserDetails userDetails = loadUserByUsername(userLoginDTO.getUsername());
+
+        return jwtToken.generateToken(userDetails);
+
+    }
 
     @Override
     public Long save(UserRegisterDTO userRegisterDTO) throws BusinessException {
@@ -93,24 +130,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User confirmRegistration(String token) throws BusinessException{
+    public User confirmRegistration(String token) throws BusinessException {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
 
-        if(token != null){
+        if (token != null) {
             User user = userRepo.findByEmail(verificationTokenService.findByToken(token).getUser().getEmail());
             userRepo.enableUser(user.getEmail());
             return user;
-        }else{
-            throw new BusinessException(404,"User not found!");
+        } else {
+            throw new BusinessException(404, "User not found!");
         }
     }
 
-
-
-
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepo.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password!");
         }

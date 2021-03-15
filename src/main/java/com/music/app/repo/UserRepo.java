@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 public interface UserRepo extends JpaRepository<User, Long> {
     User findByEmail(final String email);
 
+    User findByUsername(final String username);
 
     @Transactional
     @Modifying
