@@ -1,6 +1,8 @@
 package com.music.app.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
 @Entity
@@ -11,11 +13,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "F_NAME", nullable = false, length = 50)
     private String firstName;
+
+    @Column(name = "L_NAME", nullable = false, length = 50)
     private String lastName;
+
+    @Column(name = "USERNAME", nullable = false, length = 100)
     private String username;
+
+    @Column(name = "PASSWORD", nullable = false, length = 1000)
     private String password;
+
+    @Column(name = "EMAIL", nullable = false, length = 100)
     private String email;
+
+    @Column(name = "ENABLED", nullable = false)
     private boolean enabled;
 
 

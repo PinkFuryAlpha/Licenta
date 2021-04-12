@@ -1,7 +1,12 @@
 package com.music.app.repo;
 
-import com.music.app.config.tokens.VerificationToken;
+import com.music.app.entity.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 public interface VerificationTokenRepo extends JpaRepository<VerificationToken,Long> {
 
@@ -9,5 +14,7 @@ public interface VerificationTokenRepo extends JpaRepository<VerificationToken,L
 
     Long removeByToken(String token);
 
-
+    @Modifying
+    @Query("DELETE FROM VerificationToken v WHERE v.expireAt <= ?1")
+    void deleteAllExpiredTokens(LocalDateTime now);
 }

@@ -24,7 +24,7 @@ public class RegisterController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<User> register(@Valid @RequestBody final UserRegisterDTO userRegisterDTO) throws BusinessException {
+    public ResponseEntity<User> register(@RequestBody @Valid final UserRegisterDTO userRegisterDTO) throws BusinessException {
         long id = userService.save(userRegisterDTO);
 
         final URI location = ServletUriComponentsBuilder
@@ -36,8 +36,8 @@ public class RegisterController {
         return ResponseEntity.created(location).build();
     }
 
-    @PostMapping(path="/confirm-register/{token}")
-    public ResponseEntity<User> confirmAccount(@PathVariable final String token) throws BusinessException{
+    @GetMapping(path="/confirm-register")
+    public ResponseEntity<User> confirmAccount(@RequestParam final String token) throws BusinessException{
         return ResponseEntity.ok(userService.confirmRegistration(token));
     }
 }

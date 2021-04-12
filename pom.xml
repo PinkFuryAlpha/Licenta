@@ -107,7 +107,6 @@
         </dependency>
 
 
-
         <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -131,7 +130,10 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
         </dependency>
+
 
         <dependency>
             <groupId>org.hibernate</groupId>

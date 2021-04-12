@@ -13,4 +13,8 @@ public interface UserService extends UserDetailsService {
     User confirmRegistration(String token) throws BusinessException;
 
     String login(UserLoginDTO userLoginDTO) throws BusinessException;
+
+    String forgotPassword(String email) throws  BusinessException;
+
+    void resetPassword(String passwordResetToken, String password) throws BusinessException;
 }

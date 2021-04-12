@@ -1,15 +1,13 @@
-package com.music.app.config.Security;
+package com.music.app.config.security;
 
 import com.music.app.config.JwtAuthenticationEntryPoint;
 import com.music.app.config.JwtFilter;
 import com.music.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -56,10 +54,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authenticationProvider());
-        //.parentAuthenticationManager(authenticationManagerBean())
+    @Autowired
+    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
     }
 
     @Override
@@ -70,8 +67,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/register/**","/users/login").permitAll()
-                .antMatchers(HttpMethod.GET).hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
+                .antMatchers(HttpMethod.POST, "/register","/users/authenticate","/users/forgot-password","/users/reset-password").permitAll()
+                .antMatchers(HttpMethod.GET, "/register/confirm-register").permitAll()
+                .antMatchers(HttpMethod.GET,"/hello").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
 
                 .anyRequest()
                 .authenticated()

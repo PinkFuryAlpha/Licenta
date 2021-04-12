@@ -1,10 +1,34 @@
 package com.music.app.dto;
 
+import com.music.app.constraint.NameConstraint;
+import com.music.app.constraint.PasswordConstraint;
+import com.music.app.constraint.UsernameConstraint;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class UserRegisterDTO {
+
+    @NotBlank(message = "First Name can't be empty")
+    @NameConstraint
     private String firstName;
+
+    @NotBlank
+    @NameConstraint
     private String lastName;
+
+    @NotBlank
+    @UsernameConstraint
     private String username;
+
+    @NotBlank
+    @NotNull
+    @Email(message = "Should respect ***@*** format")
     private String email;
+
+    @NotBlank(message = "Password should be at least 8 characters long")
+    @PasswordConstraint
     private String password;
 
     public UserRegisterDTO() {

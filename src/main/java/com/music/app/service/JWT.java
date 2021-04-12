@@ -1,13 +1,16 @@
-package com.music.app.config.tokens;
+package com.music.app.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.tomcat.util.digester.DocumentProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,7 +37,7 @@ public class JWT {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJwt(token).getBody();
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token){
@@ -47,13 +50,12 @@ public class JWT {
     }
 
     private String createToken(Map<String, Object> claims, String username) {
-        String encodedKey = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes());
         return Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 *60 * 10))
-                .signWith(SignatureAlgorithm.HS256,encodedKey).compact();
+                .signWith(SignatureAlgorithm.HS512,SECRET_KEY).compact();
     }
 
-    public Boolean validateKey(String token, UserDetails userDetails){
+    public Boolean validateToken(String token, UserDetails userDetails){
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }

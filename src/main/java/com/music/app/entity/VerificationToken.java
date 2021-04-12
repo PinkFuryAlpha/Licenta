@@ -1,6 +1,4 @@
-package com.music.app.config.tokens;
-
-import com.music.app.entity.User;
+package com.music.app.entity;
 
 import javax.persistence.*;
 
