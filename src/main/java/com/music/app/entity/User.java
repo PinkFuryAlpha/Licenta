@@ -1,9 +1,8 @@
 package com.music.app.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -41,6 +40,14 @@ public class User {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_songs_created",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "song_id", referencedColumnName = "id"))
+    private Set<Song> songsCreated;
 
     public User(String firstName, String lastName, String username, String password, String email, Collection<Role> roles) {
         this.firstName = firstName;
@@ -49,7 +56,7 @@ public class User {
         this.password = password;
         this.email = email;
         this.roles = roles;
-        this.enabled=false;
+        this.enabled = false;
     }
 
     public User() {
@@ -117,6 +124,14 @@ public class User {
 
     public void setRoles(Collection<Role> roles) {
         this.roles = roles;
+    }
+
+    public Set<Song> getSongsCreated() {
+        return songsCreated;
+    }
+
+    public void setSongsCreated(Set<Song> songsCreated) {
+        this.songsCreated = songsCreated;
     }
 
 }

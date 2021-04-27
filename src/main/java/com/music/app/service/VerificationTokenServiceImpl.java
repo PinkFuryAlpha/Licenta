@@ -22,8 +22,9 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
 
     @Override
-    public VerificationToken saveVerificationToken(User user) {
+    public VerificationToken saveVerificationToken(User user, String type) {
         VerificationToken token = new VerificationToken(user, LocalDateTime.now().plusSeconds(Constants.USER_VERIFICATION_EXPIRATION));
+        token.setTokenType(type);
         verificationTokenRepo.save(token);
         return token;
     }

@@ -16,11 +16,13 @@ public class VerificationToken {
     @Column(name="confirmation_token")
     private String token;
 
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
     
     private LocalDateTime expireAt;
+
+    private String tokenType;
 
     public VerificationToken() {
     }
@@ -29,6 +31,14 @@ public class VerificationToken {
         this.token = UUID.randomUUID().toString();
         this.user = user;
         this.expireAt = expireAt;
+    }
+
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
     }
 
     public Long getId() {

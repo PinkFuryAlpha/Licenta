@@ -5,7 +5,7 @@ import com.music.app.entity.VerificationToken;
 
 public interface VerificationTokenService {
 
-     VerificationToken saveVerificationToken(User user);
+     VerificationToken saveVerificationToken(User user, String type);
 
      VerificationToken findByToken(String token);
 

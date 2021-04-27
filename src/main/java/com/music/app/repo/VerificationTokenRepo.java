@@ -4,11 +4,13 @@ import com.music.app.entity.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public interface VerificationTokenRepo extends JpaRepository<VerificationToken,Long> {
+@Repository
+public interface VerificationTokenRepo extends JpaRepository<VerificationToken, Long> {
 
     VerificationToken findByToken(final String token);
 

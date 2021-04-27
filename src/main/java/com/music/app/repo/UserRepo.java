@@ -23,4 +23,9 @@ public interface UserRepo extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "UPDATE Users a SET a.enabled = TRUE WHERE a.email = ?1", nativeQuery = true)
     void enableUser(String email);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM Users a WHERE a.enabled = 0", nativeQuery = true)
+    void deleteExpiredUsers();
 }

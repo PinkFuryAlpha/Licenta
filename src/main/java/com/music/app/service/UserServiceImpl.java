@@ -4,14 +4,17 @@ import com.music.app.config.EmailConfiguration;
 import com.music.app.config.exception.BusinessException;
 import com.music.app.dto.UserLoginDTO;
 import com.music.app.dto.UserRegisterDTO;
+import com.music.app.entity.ProfilePicture;
 import com.music.app.entity.Role;
 import com.music.app.entity.User;
 import com.music.app.entity.VerificationToken;
+import com.music.app.repo.ProfilePictureRepository;
 import com.music.app.repo.RoleRepo;
 import com.music.app.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,8 +24,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +45,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleRepo roleRepo;
+
+    @Autowired
+    private ProfilePictureRepository profilePictureRepository;
 
     @Autowired
     private VerificationTokenService verificationTokenService;
@@ -85,14 +95,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String forgotPassword(String email) throws BusinessException {
-        System.out.println(email);
         User user = userRepo.findByEmail(email);
 
         if (user == null) {
             throw new BusinessException(404, "Email is not found!");
         }
 
-        VerificationToken token = verificationTokenService.saveVerificationToken(user);
+        VerificationToken token = verificationTokenService.saveVerificationToken(user,"PASSWORD");
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(this.emailConfig.getHost());
@@ -120,13 +129,30 @@ public class UserServiceImpl implements UserService {
     public void resetPassword(String passwordResetToken, String password) throws BusinessException {
         VerificationToken resetPasswordToken = verificationTokenService.findByToken(passwordResetToken);
 
-        if (resetPasswordToken != null && resetPasswordToken.getExpireAt().isBefore(LocalDateTime.now())) {
+        if (resetPasswordToken != null && resetPasswordToken.getExpireAt().isAfter(LocalDateTime.now()) && resetPasswordToken.getTokenType().equals("PASSWORD")) {
             Long userId = userRepo.findByEmail(verificationTokenService.findByToken(passwordResetToken).getUser().getEmail()).getId();
             userRepo.updatePassword(bCryptPasswordEncoder.encode(password), userId);
             verificationTokenService.removeToken(passwordResetToken);
         } else {
             throw new BusinessException(404, "Link expired or token is invalid!");
         }
+    }
+
+    @Transactional
+    @Override
+    public Long saveProfilePicture(MultipartFile multipartFile, HttpServletRequest request) throws BusinessException {
+        ProfilePicture profilePicture = new ProfilePicture();
+        Principal principal= request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+        System.out.println(user.toString());
+        try {
+            profilePicture.setContent(multipartFile.getBytes());
+            profilePicture.setUser(user);
+        } catch (IOException e) {
+            throw new BusinessException(400,"Image is empty or corrupted");
+        }
+        
+        return profilePictureRepository.save(profilePicture).getId();
     }
 
     @Override
@@ -149,7 +175,7 @@ public class UserServiceImpl implements UserService {
 
         long id = userRepo.save(user).getId();
 
-        VerificationToken token = verificationTokenService.saveVerificationToken(user);
+        VerificationToken token = verificationTokenService.saveVerificationToken(user,"REGISTER");
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(this.emailConfig.getHost());
@@ -172,18 +198,24 @@ public class UserServiceImpl implements UserService {
         return id;
     }
 
+    @Transactional
+    @Scheduled(fixedRate = 60 * 60 * 1000)
+    public void deleteExpiredUsers(){
+        userRepo.deleteExpiredUsers();
+        System.out.println("Deleted expired users!");
+    }
 
     @Override
     public User confirmRegistration(String token) throws BusinessException {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
 
-        if (verificationToken != null && verificationToken.getExpireAt().isBefore(LocalDateTime.now())) {
+        if (verificationToken != null && verificationToken.getExpireAt().isAfter(LocalDateTime.now()) && verificationToken.getTokenType().equals("REGISTER")) {
             User user = userRepo.findByEmail(verificationTokenService.findByToken(token).getUser().getEmail());
             userRepo.enableUser(user.getEmail());
             verificationTokenService.removeToken(token);
             return user;
         } else {
-            throw new BusinessException(404, "User not found, or link expired!");
+            throw new BusinessException(404, "Invalid, or expired link!");
         }
     }
 
@@ -191,10 +223,9 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByUsername(username);
 
-        if (user == null) {
+        if (user == null || !user.isEnabled()) {
             throw new UsernameNotFoundException("Invalid username or password!");
         }
-        //boolean enabled = !user.isEnabled();
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
                 mapRolesToAuthorities(user.getRoles()));
     }
