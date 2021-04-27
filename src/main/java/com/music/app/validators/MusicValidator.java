@@ -19,7 +19,7 @@ public class MusicValidator implements ConstraintValidator<MusicFileConstraint, 
         boolean result = true;
 
         String contentType = song.getContentType();
-        if (!isSupportedContentType(contentType)) {
+        if (contentType != null && !isSupportedContentType(contentType)) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
                     "Only mp3 format is allowed.")
@@ -43,7 +43,6 @@ public class MusicValidator implements ConstraintValidator<MusicFileConstraint, 
     }
 
     private boolean isSupportedContentType(String contentType) {
-        System.out.println(contentType.equals("audio/mpeg"));
         return contentType.equals("audio/mpeg");
     }
 }

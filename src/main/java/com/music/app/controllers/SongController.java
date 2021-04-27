@@ -2,6 +2,7 @@ package com.music.app.controllers;
 
 import com.music.app.config.exception.BusinessException;
 import com.music.app.constraint.MusicFileConstraint;
+import com.music.app.constraint.PhotoConstraint;
 import com.music.app.dto.SongSaveDto;
 import com.music.app.entity.User;
 import com.music.app.service.SongService;
@@ -32,7 +33,7 @@ public class SongController {
     }
 
     @PostMapping()
-    public ResponseEntity<User> saveSong(@RequestPart("cover-photo") MultipartFile photo, @RequestPart("music-file") @MusicFileConstraint MultipartFile file, @RequestPart("song-details") final SongSaveDto songSaveDto) throws BusinessException, IOException {
+    public ResponseEntity<User> saveSong(@RequestPart("cover-photo") @PhotoConstraint MultipartFile photo, @RequestPart("music-file") @MusicFileConstraint MultipartFile file, @RequestPart("song-details") final SongSaveDto songSaveDto) throws BusinessException, IOException {
         long id = songService.saveSong(songSaveDto, photo, file);
 
         final URI location = ServletUriComponentsBuilder
