@@ -28,6 +28,17 @@ public class MusicValidator implements ConstraintValidator<MusicFileConstraint, 
             result = false;
         }
 
+        if (song.getSize() > 100 * 1024 * 1024) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("File can't pe greater than 100Mb")
+                    .addConstraintViolation();
+            result = false;
+        }
+
+        if(song.getSize()<0 || song.isEmpty()){
+            result=false;
+        }
+
         return result;
     }
 

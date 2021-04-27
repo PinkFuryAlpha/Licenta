@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD,ElementType.FIELD,ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MusicFileConstraint {
-        String message() default "Is not a valid file!";
+        String message() default "File can't be empty!";
 
         long value () default (1024 * 1024 * 100);
 

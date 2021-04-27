@@ -2,6 +2,7 @@ package com.music.app.service;
 
 import com.music.app.config.EmailConfiguration;
 import com.music.app.config.exception.BusinessException;
+import com.music.app.dto.PasswordResetDto;
 import com.music.app.dto.UserLoginDTO;
 import com.music.app.dto.UserRegisterDTO;
 import com.music.app.entity.ProfilePicture;
@@ -126,12 +127,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void resetPassword(String passwordResetToken, String password) throws BusinessException {
+    public void resetPassword(String passwordResetToken, PasswordResetDto password) throws BusinessException {
         VerificationToken resetPasswordToken = verificationTokenService.findByToken(passwordResetToken);
 
         if (resetPasswordToken != null && resetPasswordToken.getExpireAt().isAfter(LocalDateTime.now()) && resetPasswordToken.getTokenType().equals("PASSWORD")) {
             Long userId = userRepo.findByEmail(verificationTokenService.findByToken(passwordResetToken).getUser().getEmail()).getId();
-            userRepo.updatePassword(bCryptPasswordEncoder.encode(password), userId);
+            userRepo.updatePassword(bCryptPasswordEncoder.encode(password.getPassword()), userId);
             verificationTokenService.removeToken(passwordResetToken);
         } else {
             throw new BusinessException(404, "Link expired or token is invalid!");
