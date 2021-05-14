@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String BASIC_USER_ROLE = "BASIC_USER";
+    private static final String ARTIST = "ARTIST";
 
     @Autowired
     private UserService userService;
@@ -67,9 +68,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/register","/users/authenticate","/users/forgot-password","/users/reset-password","/songs").permitAll()
-                .antMatchers(HttpMethod.GET, "/register/confirm-register").permitAll()
-                .antMatchers(HttpMethod.GET,"/hello","/users/save-profile-image").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
+                .antMatchers(HttpMethod.POST, "/register", "/users/authenticate", "/users/forgot-password", "/users/reset-password", "/songs", "/users/update-to-artist").permitAll()
+                .antMatchers(HttpMethod.GET, "/register/confirm-register","/media/**","/songs").permitAll()
+                .antMatchers(HttpMethod.GET, "/hello", "/users/save-profile-image").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
+                .antMatchers(HttpMethod.POST, "/songs").hasAnyRole(ARTIST)
+                .antMatchers(HttpMethod.POST, "/songs/get-song","/songs/like","/songs/unLike").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
 
                 .anyRequest()
                 .authenticated()

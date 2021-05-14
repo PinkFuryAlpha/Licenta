@@ -1,5 +1,6 @@
 package com.music.app.repo;
 
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -17,5 +18,13 @@ public class MediaRepository {
         Files.write(savePath,media);
 
         return savePath.toAbsolutePath().toString();
+    }
+
+    public FileSystemResource fetchMedia(String location) {
+        try {
+            return new FileSystemResource(Paths.get(location));
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
     }
 }

@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(404, "Email is not found!");
         }
 
-        VerificationToken token = verificationTokenService.saveVerificationToken(user,"PASSWORD");
+        VerificationToken token = verificationTokenService.saveVerificationToken(user, "PASSWORD");
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(this.emailConfig.getHost());
@@ -143,16 +143,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long saveProfilePicture(MultipartFile multipartFile, HttpServletRequest request) throws BusinessException {
         ProfilePicture profilePicture = new ProfilePicture();
-        Principal principal= request.getUserPrincipal();
+        Principal principal = request.getUserPrincipal();
         User user = userRepo.findByUsername(principal.getName());
-        System.out.println(user.toString());
         try {
             profilePicture.setContent(multipartFile.getBytes());
             profilePicture.setUser(user);
         } catch (IOException e) {
-            throw new BusinessException(400,"Image is empty or corrupted");
+            throw new BusinessException(400, "Image is empty or corrupted");
         }
-        
+
         return profilePictureRepository.save(profilePicture).getId();
     }
 
@@ -160,6 +159,10 @@ public class UserServiceImpl implements UserService {
     public Long save(UserRegisterDTO userRegisterDTO) throws BusinessException {
 
         User user = userRepo.findByEmail(userRegisterDTO.getEmail());
+
+        Collection<Role> roles = new HashSet<>();
+
+        roleRepo.findById(2).ifPresent(roles::add);
 
         if (user != null) {
             throw new BusinessException(403, "The email is already in use!");
@@ -172,11 +175,11 @@ public class UserServiceImpl implements UserService {
                 userRegisterDTO.getUsername(),
                 bCryptPasswordEncoder.encode(userRegisterDTO.getPassword()),
                 userRegisterDTO.getEmail(),
-                Collections.singletonList(new Role("BASIC_USER")));
+                roles);
 
         long id = userRepo.save(user).getId();
 
-        VerificationToken token = verificationTokenService.saveVerificationToken(user,"REGISTER");
+        VerificationToken token = verificationTokenService.saveVerificationToken(user, "REGISTER");
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(this.emailConfig.getHost());
@@ -199,13 +202,6 @@ public class UserServiceImpl implements UserService {
         return id;
     }
 
-    @Transactional
-    @Scheduled(fixedRate = 60 * 60 * 1000)
-    public void deleteExpiredUsers(){
-        userRepo.deleteExpiredUsers();
-        System.out.println("Deleted expired users!");
-    }
-
     @Override
     public User confirmRegistration(String token) throws BusinessException {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
@@ -218,6 +214,28 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new BusinessException(404, "Invalid, or expired link!");
         }
+    }
+
+    @Override
+    public void updateUserToArtist(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+        Collection<Role> userRoles = user.getRoles();
+
+        roleRepo.findById(3).ifPresentOrElse(userRoles::add, () -> {
+            try {
+                throw new BusinessException(404, "Role not found!");
+            } catch (BusinessException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 60 * 60 * 1000)
+    public void deleteExpiredUsers() {
+        userRepo.deleteExpiredUsers();
+        System.out.println("Deleted expired users!");
     }
 
     @Override

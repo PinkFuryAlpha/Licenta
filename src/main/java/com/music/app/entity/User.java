@@ -1,5 +1,7 @@
 package com.music.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Set;
@@ -47,7 +49,18 @@ public class User {
                     name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
                     name = "song_id", referencedColumnName = "id"))
+    @JsonBackReference
     private Set<Song> songsCreated;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_liked_songs",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "song_id", referencedColumnName = "id"))
+    @JsonBackReference
+    private Set<Song> likedSongs;
 
     public User(String firstName, String lastName, String username, String password, String email, Collection<Role> roles) {
         this.firstName = firstName;
@@ -134,4 +147,11 @@ public class User {
         this.songsCreated = songsCreated;
     }
 
+    public Set<Song> getLikedSongs() {
+        return likedSongs;
+    }
+
+    public void setLikedSongs(Set<Song> likedSongs) {
+        this.likedSongs = likedSongs;
+    }
 }

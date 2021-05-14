@@ -1,5 +1,6 @@
 package com.music.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.music.app.dto.Genre;
 
 import javax.persistence.Column;
@@ -23,9 +24,6 @@ public class Song {
     @Column(name = "song_name",nullable = false)
     private String songName;
 
-    @Column(name = "song_duration",nullable = false)
-    private Double duration;
-
     @Column(name = "views",nullable = false)
     private Long views;
 
@@ -42,7 +40,12 @@ public class Song {
     private String musicStoreLocation;
 
     @ManyToMany(mappedBy = "songsCreated")
+    @JsonManagedReference
     private Set<User> artists;
+
+    @ManyToMany(mappedBy = "likedSongs")
+    @JsonManagedReference
+    private Set<User> usersWhoLiked;
 
     public Song() {
     }
@@ -61,14 +64,6 @@ public class Song {
 
     public void setSongName(String songName) {
         this.songName = songName;
-    }
-
-    public Double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Double duration) {
-        this.duration = duration;
     }
 
     public Long getViews() {
@@ -121,5 +116,13 @@ public class Song {
 
     public void setArtists(Set<User> artists) {
         this.artists = artists;
+    }
+
+    public Set<User> getUsersWhoLiked() {
+        return usersWhoLiked;
+    }
+
+    public void setUsersWhoLiked(Set<User> usersWhoLiked) {
+        this.usersWhoLiked = usersWhoLiked;
     }
 }

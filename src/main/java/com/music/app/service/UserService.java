@@ -18,9 +18,12 @@ public interface UserService extends UserDetailsService {
 
     String login(UserLoginDTO userLoginDTO) throws BusinessException;
 
-    String forgotPassword(String email) throws  BusinessException;
+    String forgotPassword(String email) throws BusinessException;
 
     void resetPassword(String passwordResetToken, PasswordResetDto password) throws BusinessException;
 
     Long saveProfilePicture(MultipartFile multipartFile, HttpServletRequest request) throws BusinessException;
+
+    void updateUserToArtist(HttpServletRequest request);
+
 }

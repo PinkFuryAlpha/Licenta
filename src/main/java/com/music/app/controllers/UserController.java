@@ -64,4 +64,11 @@ public class UserController {
 
         return ResponseEntity.created(location).build();
     }
+
+    @PostMapping(path = "/update-to-artist")
+    public ResponseEntity<String> updateUserRole(HttpServletRequest request){
+        userService.updateUserToArtist(request);
+
+        return ResponseEntity.ok("User updated to artist!");
+    }
 }
