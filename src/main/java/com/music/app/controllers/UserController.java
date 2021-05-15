@@ -44,7 +44,6 @@ public class UserController {
         return ResponseEntity.ok(userService.forgotPassword(email));
     }
 
-    //CONSTRAINT NOT WORKING
     @PostMapping(path = "/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam final String token, @RequestParam @Valid final PasswordResetDto password) throws BusinessException {
         userService.resetPassword(token,password);

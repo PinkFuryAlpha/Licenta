@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface MediaService {
-    public String saveMedia(MultipartFile media, String path) throws IOException;
+    String saveMedia(MultipartFile media, String path) throws IOException;
 
-    public FileSystemResource findMedia(Long songId);
+    FileSystemResource findMedia(Long songId);
 
-    public InputStream getSong(Long songId) throws FileNotFoundException;
+    InputStream getSong(Long songId) throws FileNotFoundException;
+
+    void deleteSong(Long songId);
 }

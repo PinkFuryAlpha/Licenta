@@ -11,6 +11,7 @@ public class SongToDto {
 
     public static SongStreamDto convertEntityToStreamDto(Song song) {
         SongStreamDto streamDto = new SongStreamDto();
+        streamDto.setId(song.getId());
         streamDto.setSongName(song.getSongName());
         streamDto.setGenre(song.getGenre());
         streamDto.setViews(song.getViews() + 1);

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -25,6 +26,17 @@ public class MediaRepository {
             return new FileSystemResource(Paths.get(location));
         } catch (Exception e) {
             throw new RuntimeException();
+        }
+    }
+
+    public void deleteMedia(String location){
+        try{
+            Files.delete(Paths.get(location));
+        }catch(NoSuchFileException e){
+            System.err.println("%s: no such" + " file or directory%n");
+        }
+        catch (IOException e) {
+            System.err.println(e);
         }
     }
 }

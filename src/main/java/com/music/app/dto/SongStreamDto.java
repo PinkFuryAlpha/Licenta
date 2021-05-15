@@ -3,6 +3,8 @@ package com.music.app.dto;
 import java.util.Set;
 
 public class SongStreamDto {
+    private Long id;
+
     private String songName;
 
     private Genre genre;
@@ -14,6 +16,14 @@ public class SongStreamDto {
     private Long views;
 
     private Set<String> artists;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getSongName() {
         return songName;

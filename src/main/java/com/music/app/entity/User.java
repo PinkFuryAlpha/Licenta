@@ -62,6 +62,10 @@ public class User {
     @JsonBackReference
     private Set<Song> likedSongs;
 
+    @OneToMany(mappedBy = "owner")
+    @JsonBackReference
+    private Set<Playlist> playlists;
+
     public User(String firstName, String lastName, String username, String password, String email, Collection<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -153,5 +157,13 @@ public class User {
 
     public void setLikedSongs(Set<Song> likedSongs) {
         this.likedSongs = likedSongs;
+    }
+
+    public Set<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(Set<Playlist> playlists) {
+        this.playlists = playlists;
     }
 }

@@ -51,4 +51,12 @@ public class MediaServiceImpl implements MediaService {
         return new FileInputStream(song.getMusicStoreLocation());
     }
 
+    @Override
+    public void deleteSong(Long songId){
+        Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        mediaRepository.deleteMedia(song.getMusicStoreLocation());
+        mediaRepository.deleteMedia(song.getCoverPhotoStoreLocation());
+    }
+
 }

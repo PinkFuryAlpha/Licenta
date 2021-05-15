@@ -22,4 +22,7 @@ public interface SongService {
     void likeSong(Long songId, HttpServletRequest request) throws BusinessException;
 
     void unlikeSong(Long songId, HttpServletRequest request) throws BusinessException;
+
+    void deleteSong(Long songId,HttpServletRequest request) throws BusinessException;
+
 }

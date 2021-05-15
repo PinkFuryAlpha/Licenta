@@ -1,13 +1,18 @@
 package com.music.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.music.app.dto.Genre;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -46,6 +51,16 @@ public class Song {
     @ManyToMany(mappedBy = "likedSongs")
     @JsonManagedReference
     private Set<User> usersWhoLiked;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "playlists_songs",
+            joinColumns = @JoinColumn(
+                    name ="song_id" , referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "playlist_id", referencedColumnName = "id"))
+    @JsonBackReference
+    private Set<Playlist> playlists;
 
     public Song() {
     }
@@ -124,5 +139,13 @@ public class Song {
 
     public void setUsersWhoLiked(Set<User> usersWhoLiked) {
         this.usersWhoLiked = usersWhoLiked;
+    }
+
+    public Set<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(Set<Playlist> playlists) {
+        this.playlists = playlists;
     }
 }

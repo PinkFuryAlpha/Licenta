@@ -4,11 +4,9 @@ import com.music.app.config.exception.BusinessException;
 import com.music.app.config.mapper.SongToDto;
 import com.music.app.dto.SongSaveDto;
 import com.music.app.dto.SongStreamDto;
-import com.music.app.entity.Role;
 import com.music.app.entity.Song;
 import com.music.app.entity.User;
 import com.music.app.dto.pageables.SongDto;
-import com.music.app.repo.RoleRepo;
 import com.music.app.repo.SongRepository;
 import com.music.app.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,7 +64,11 @@ public class SongServiceImpl implements SongService {
                 user.getSongsCreated().add(song);
                 artists.add(user);
             } else {
-                throw new UsernameNotFoundException("The user is not an artist.");
+                try {
+                    throw new BusinessException(400, "The user is not an artist.");
+                } catch (BusinessException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -130,6 +130,9 @@ public class SongServiceImpl implements SongService {
                 .findById(songId)
                 .orElseThrow(() -> new BusinessException(404, "Song was not found, or probably deleted."));
 
+        if (song.getUsersWhoLiked().contains(user)) {
+            throw new BusinessException(400, "User already liked!");
+        }
         song.getUsersWhoLiked().add(user);
         user.getLikedSongs().add(song);
         song.setUpVotes(song.getUpVotes() + 1);
@@ -152,6 +155,22 @@ public class SongServiceImpl implements SongService {
         } else {
             throw new BusinessException(400, "User did not like the song.");
         }
+    }
 
+    @Transactional
+    public void deleteSong(Long songId,HttpServletRequest request) throws BusinessException {
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+
+        Song song = songRepository
+                .findById(songId)
+                .orElseThrow(() -> new BusinessException(404, "Song was not found, or probably deleted."));
+
+        if(!song.getArtists().contains(user)){
+            throw new BusinessException(401,"The user is not an contributor.");
+        }
+
+        mediaService.deleteSong(songId);
+        songRepository.delete(song);
     }
 }
