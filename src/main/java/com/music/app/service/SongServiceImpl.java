@@ -4,18 +4,18 @@ import com.music.app.config.exception.BusinessException;
 import com.music.app.config.mapper.SongToDto;
 import com.music.app.dto.SongSaveDto;
 import com.music.app.dto.SongStreamDto;
+import com.music.app.entity.Photo;
 import com.music.app.entity.Song;
 import com.music.app.entity.User;
 import com.music.app.dto.pageables.SongDto;
+import com.music.app.repo.PhotoRepository;
 import com.music.app.repo.SongRepository;
 import com.music.app.repo.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,28 +36,33 @@ public class SongServiceImpl implements SongService {
 
     private final MediaService mediaService;
 
+    private final PhotoRepository photoRepository;
+
     @Value("${song.photo.path}")
     private String photoCover;
 
     @Value("${song.media.path}")
     private String music;
 
-    @Autowired
-    public SongServiceImpl(SongRepository songRepository, UserRepo userRepo, MediaService mediaService) {
+    public SongServiceImpl(SongRepository songRepository, UserRepo userRepo,
+                           MediaService mediaService, PhotoRepository photoRepository) {
         this.songRepository = songRepository;
         this.userRepo = userRepo;
         this.mediaService = mediaService;
+        this.photoRepository = photoRepository;
     }
 
     @Override
+    @Transactional
     public Long saveSong(SongSaveDto songSaveDto, MultipartFile photo, MultipartFile file, HttpServletRequest request) throws IOException, BusinessException {
         Song song = new Song();
+        Photo songCoverPhoto = new Photo();
         Set<User> artists = new LinkedHashSet<>();
         Principal principal = request.getUserPrincipal();
         User creator = userRepo.findByUsername(principal.getName());
 
         artists.add(creator);
-        creator.getSongsCreated().add(song);
+
 
         songSaveDto.getArtists().stream().map(userRepo::findByUsername).forEach(user -> {
             if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ARTIST"))) {
@@ -72,7 +77,9 @@ public class SongServiceImpl implements SongService {
             }
         });
 
-        String coverPhotoPath = mediaService.saveMedia(photo, this.photoCover);
+        songCoverPhoto.setPhotoStoreLocation(mediaService.saveMedia(photo, this.photoCover));
+        songCoverPhoto.setSong(song);
+        photoRepository.save(songCoverPhoto);
 
         String musicPath = mediaService.saveMedia(file, this.music);
 
@@ -80,13 +87,13 @@ public class SongServiceImpl implements SongService {
 
         song.setSongName(songSaveDto.getSongName());
         song.setGenre(songSaveDto.getGenre());
-        song.setCoverPhotoStoreLocation(coverPhotoPath);
+        song.setSongCoverPhoto(songCoverPhoto);
         song.setMusicStoreLocation(musicPath);
         song.setUpVotes(0);
         song.setViews(0L);
         song.setArtists(artists);
 
-
+        creator.getSongsCreated().add(song);
         return songRepository.save(song).getId();
     }
 

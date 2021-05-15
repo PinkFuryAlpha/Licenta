@@ -44,7 +44,7 @@ public class SongController {
                                          @RequestPart("music-file") @MusicFileConstraint MultipartFile file,
                                          @RequestPart("song-details") final SongSaveDto songSaveDto,
                                          HttpServletRequest request) throws BusinessException, IOException {
-        long id = songService.saveSong(songSaveDto, photo, file,request);
+        long id = songService.saveSong(songSaveDto, photo, file, request);
 
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -56,7 +56,7 @@ public class SongController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<SongStreamDto>> getAllSongs(@RequestBody final SongDto songDto){
+    public ResponseEntity<Page<SongStreamDto>> getAllSongs(@RequestBody final SongDto songDto) {
         return ResponseEntity.ok(songService.getSongs(songDto));
     }
 
@@ -67,19 +67,19 @@ public class SongController {
 
     @PostMapping(path = "/like")
     public ResponseEntity<String> likeSong(@RequestParam final Long songId, HttpServletRequest request) throws BusinessException {
-        songService.likeSong(songId,request);
+        songService.likeSong(songId, request);
         return ResponseEntity.ok("Song has been liked.");
     }
 
     @PostMapping(path = "/unLike")
     public ResponseEntity<String> unlikeSong(@RequestParam final Long songId, HttpServletRequest request) throws BusinessException {
-        songService.unlikeSong(songId,request);
+        songService.unlikeSong(songId, request);
         return ResponseEntity.ok("Song has been unliked.");
     }
 
     @DeleteMapping(path = "/delete")
-    public ResponseEntity<String> deleteSong(@RequestParam final Long songId,HttpServletRequest request) throws BusinessException{
-        songService.deleteSong(songId,request);
+    public ResponseEntity<String> deleteSong(@RequestParam final Long songId, HttpServletRequest request) throws BusinessException {
+        songService.deleteSong(songId, request);
         return ResponseEntity.ok("Song has been deleted.");
     }
 

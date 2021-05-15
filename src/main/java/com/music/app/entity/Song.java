@@ -13,8 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.Set;
 
@@ -38,8 +38,9 @@ public class Song {
     @Column(name = "upVotes")
     private Long upVotes;
 
-    @Column(name = "cover_photo_path", nullable = false)
-    private String coverPhotoStoreLocation;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "photo_id", referencedColumnName = "id")
+    private Photo songCoverPhoto;
 
     @Column(name = "song_storage_location", nullable = false)
     private String musicStoreLocation;
@@ -105,14 +106,6 @@ public class Song {
         this.upVotes = upVotes;
     }
 
-    public String getCoverPhotoStoreLocation() {
-        return coverPhotoStoreLocation;
-    }
-
-    public void setCoverPhotoStoreLocation(String coverPhotoStoreLocation) {
-        this.coverPhotoStoreLocation = coverPhotoStoreLocation;
-    }
-
     public String getMusicStoreLocation() {
         return musicStoreLocation;
     }
@@ -147,5 +140,13 @@ public class Song {
 
     public void setPlaylists(Set<Playlist> playlists) {
         this.playlists = playlists;
+    }
+
+    public Photo getSongCoverPhoto() {
+        return songCoverPhoto;
+    }
+
+    public void setSongCoverPhoto(Photo songCoverPhoto) {
+        this.songCoverPhoto = songCoverPhoto;
     }
 }

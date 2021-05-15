@@ -28,9 +28,10 @@ public class MediaController {
         this.mediaService = mediaService;
     }
 
-    @GetMapping(path = "/fetch-image", produces = MediaType.IMAGE_JPEG_VALUE)
-    public ResponseEntity<FileSystemResource> getImage(@RequestParam final Long songId) throws Exception {
-        return ResponseEntity.ok(mediaService.findMedia(songId));
+
+    @GetMapping(path = "/getImage", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<FileSystemResource> getImage(@RequestParam final Long photoId) throws Exception {
+        return ResponseEntity.ok(mediaService.getPhoto(photoId));
     }
 
     @GetMapping(path = "/getSong")

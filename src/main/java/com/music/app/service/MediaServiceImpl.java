@@ -16,8 +16,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Service
 public class MediaServiceImpl implements MediaService {
@@ -44,13 +42,6 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public FileSystemResource findMedia(Long songId) {
-        Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return mediaRepository.fetchMedia(song.getCoverPhotoStoreLocation());
-    }
-
-    @Override
     public InputStream getSong(Long songId) throws FileNotFoundException {
         Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -62,14 +53,20 @@ public class MediaServiceImpl implements MediaService {
         Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         mediaRepository.deleteMedia(song.getMusicStoreLocation());
-        mediaRepository.deleteMedia(song.getCoverPhotoStoreLocation());
+    }
+
+    @Override
+    public FileSystemResource getPhoto(Long photoId){
+        Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+         return mediaRepository.fetchMedia(photo.getPhotoStoreLocation());
     }
 
     @Override
     public void deletePhoto(Long photoId) {
         Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        mediaRepository.deleteMedia(photo.getProfilePictureStoreLocation());
+        mediaRepository.deleteMedia(photo.getPhotoStoreLocation());
     }
 
 }

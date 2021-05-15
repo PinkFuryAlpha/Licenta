@@ -10,11 +10,11 @@ import java.io.InputStream;
 public interface MediaService {
     String saveMedia(MultipartFile media, String path) throws IOException;
 
-    FileSystemResource findMedia(Long songId);
-
     InputStream getSong(Long songId) throws FileNotFoundException;
 
     void deleteSong(Long songId);
 
     void deletePhoto(Long photoId);
+
+    FileSystemResource getPhoto(Long photoId);
 }

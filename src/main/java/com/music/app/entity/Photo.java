@@ -2,12 +2,10 @@ package com.music.app.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -24,8 +22,12 @@ public class Photo {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToOne(mappedBy = "songCoverPhoto")
+    @JoinColumn(name = "album_id")
+    private Song song;
+
     @Column(name = "profile_picture_path", nullable = false)
-    private String profilePictureStoreLocation;
+    private String photoStoreLocation;
 
     public User getUser() {
         return user;
@@ -43,11 +45,19 @@ public class Photo {
         this.id = id;
     }
 
-    public String getProfilePictureStoreLocation() {
-        return profilePictureStoreLocation;
+    public String getPhotoStoreLocation() {
+        return photoStoreLocation;
     }
 
-    public void setProfilePictureStoreLocation(String profilePictureStoreLocation) {
-        this.profilePictureStoreLocation = profilePictureStoreLocation;
+    public void setPhotoStoreLocation(String photoStoreLocation) {
+        this.photoStoreLocation = photoStoreLocation;
+    }
+
+    public Song getSong() {
+        return song;
+    }
+
+    public void setSong(Song song) {
+        this.song = song;
     }
 }

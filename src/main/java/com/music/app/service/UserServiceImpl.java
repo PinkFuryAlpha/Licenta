@@ -156,14 +156,14 @@ public class UserServiceImpl implements UserService {
         if(user.getProfilePicture() == null){
             Photo photo = new Photo();
             photo.setUser(user);
-            photo.setProfilePictureStoreLocation(mediaService.saveMedia(media, profilePhotoDirectory));
+            photo.setPhotoStoreLocation(mediaService.saveMedia(media, profilePhotoDirectory));
             user.setProfilePicture(photo);
             id =photoRepository.save(photo).getId();
         } else{
             Photo photo = user.getProfilePicture();
             mediaService.deletePhoto(photo.getId());
             String newPhotoLocation = mediaService.saveMedia(media, profilePhotoDirectory);
-            photo.setProfilePictureStoreLocation(newPhotoLocation);
+            photo.setPhotoStoreLocation(newPhotoLocation);
             id = photo.getId();
         }
 
