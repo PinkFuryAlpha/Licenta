@@ -5,14 +5,15 @@ import com.music.app.config.exception.BusinessException;
 import com.music.app.dto.PasswordResetDto;
 import com.music.app.dto.UserLoginDTO;
 import com.music.app.dto.UserRegisterDTO;
-import com.music.app.entity.ProfilePicture;
+import com.music.app.entity.Photo;
 import com.music.app.entity.Role;
 import com.music.app.entity.User;
 import com.music.app.entity.VerificationToken;
-import com.music.app.repo.ProfilePictureRepository;
+import com.music.app.repo.PhotoRepository;
 import com.music.app.repo.RoleRepo;
 import com.music.app.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -48,10 +49,13 @@ public class UserServiceImpl implements UserService {
     private RoleRepo roleRepo;
 
     @Autowired
-    private ProfilePictureRepository profilePictureRepository;
+    private PhotoRepository photoRepository;
 
     @Autowired
     private VerificationTokenService verificationTokenService;
+
+    @Autowired
+    private MediaService mediaService;
 
     @Autowired
     private EmailConfiguration emailConfig;
@@ -64,6 +68,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Value("${profile.photo.path}")
+    private String profilePhotoDirectory;
 
     @Override
     public String login(UserLoginDTO userLoginDTO) throws BusinessException {
@@ -141,18 +148,26 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Long saveProfilePicture(MultipartFile multipartFile, HttpServletRequest request) throws BusinessException {
-        ProfilePicture profilePicture = new ProfilePicture();
+    public Long saveProfilePicture(MultipartFile media, HttpServletRequest request) throws BusinessException, IOException {
         Principal principal = request.getUserPrincipal();
         User user = userRepo.findByUsername(principal.getName());
-        try {
-            profilePicture.setContent(multipartFile.getBytes());
-            profilePicture.setUser(user);
-        } catch (IOException e) {
-            throw new BusinessException(400, "Image is empty or corrupted");
+
+        Long id = 2L;
+        if(user.getProfilePicture() == null){
+            Photo photo = new Photo();
+            photo.setUser(user);
+            photo.setProfilePictureStoreLocation(mediaService.saveMedia(media, profilePhotoDirectory));
+            user.setProfilePicture(photo);
+            id =photoRepository.save(photo).getId();
+        } else{
+            Photo photo = user.getProfilePicture();
+            mediaService.deletePhoto(photo.getId());
+            String newPhotoLocation = mediaService.saveMedia(media, profilePhotoDirectory);
+            photo.setProfilePictureStoreLocation(newPhotoLocation);
+            id = photo.getId();
         }
 
-        return profilePictureRepository.save(profilePicture).getId();
+        return id;
     }
 
     @Override

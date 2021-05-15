@@ -1,10 +1,10 @@
 package com.music.app.controllers;
 
 import com.music.app.config.exception.BusinessException;
-import com.music.app.constraint.PasswordConstraint;
+import com.music.app.constraint.PhotoConstraint;
 import com.music.app.dto.PasswordResetDto;
 import com.music.app.dto.UserLoginDTO;
-import com.music.app.entity.ProfilePicture;
+import com.music.app.entity.Photo;
 import com.music.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 
 @RestController
@@ -52,7 +53,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/save-profile-image")
-    public ResponseEntity<ProfilePicture> saveProfileImage(@RequestPart("file") MultipartFile file, HttpServletRequest request) throws BusinessException {
+    public ResponseEntity<Photo> saveProfileImage(@RequestPart("file") @PhotoConstraint MultipartFile file, HttpServletRequest request) throws BusinessException, IOException {
         long id = userService.saveProfilePicture(file,request);
 
         final URI location = ServletUriComponentsBuilder

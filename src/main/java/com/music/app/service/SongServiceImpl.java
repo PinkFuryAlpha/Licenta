@@ -54,8 +54,8 @@ public class SongServiceImpl implements SongService {
         Song song = new Song();
         Set<User> artists = new LinkedHashSet<>();
         Principal principal = request.getUserPrincipal();
-
         User creator = userRepo.findByUsername(principal.getName());
+
         artists.add(creator);
         creator.getSongsCreated().add(song);
 

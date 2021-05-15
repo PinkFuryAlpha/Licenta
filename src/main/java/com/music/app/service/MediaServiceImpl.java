@@ -1,7 +1,9 @@
 package com.music.app.service;
 
+import com.music.app.entity.Photo;
 import com.music.app.entity.Song;
 import com.music.app.repo.MediaRepository;
+import com.music.app.repo.PhotoRepository;
 import com.music.app.repo.SongRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -24,10 +26,14 @@ public class MediaServiceImpl implements MediaService {
 
     private final MediaRepository mediaRepository;
 
+    private final PhotoRepository photoRepository;
+
     @Autowired
-    public MediaServiceImpl(MediaRepository mediaRepository, SongRepository songRepository) {
-        this.mediaRepository = mediaRepository;
+    public MediaServiceImpl(SongRepository songRepository,
+                            MediaRepository mediaRepository, PhotoRepository photoRepository) {
         this.songRepository = songRepository;
+        this.mediaRepository = mediaRepository;
+        this.photoRepository = photoRepository;
     }
 
     @Override
@@ -52,11 +58,18 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public void deleteSong(Long songId){
+    public void deleteSong(Long songId) {
         Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         mediaRepository.deleteMedia(song.getMusicStoreLocation());
         mediaRepository.deleteMedia(song.getCoverPhotoStoreLocation());
+    }
+
+    @Override
+    public void deletePhoto(Long photoId) {
+        Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        mediaRepository.deleteMedia(photo.getProfilePictureStoreLocation());
     }
 
 }

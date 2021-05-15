@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 public interface UserService extends UserDetailsService {
 
@@ -22,7 +23,7 @@ public interface UserService extends UserDetailsService {
 
     void resetPassword(String passwordResetToken, PasswordResetDto password) throws BusinessException;
 
-    Long saveProfilePicture(MultipartFile multipartFile, HttpServletRequest request) throws BusinessException;
+    Long saveProfilePicture(MultipartFile multipartFile, HttpServletRequest request) throws BusinessException, IOException;
 
     void updateUserToArtist(HttpServletRequest request);
 

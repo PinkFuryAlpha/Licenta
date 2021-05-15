@@ -13,19 +13,19 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "profile_picture")
-public class ProfilePicture {
+public class Photo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     Long id;
 
-    @Lob
-    byte[] content;
-
-    @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "profilePicture")
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "profile_picture_path", nullable = false)
+    private String profilePictureStoreLocation;
 
     public User getUser() {
         return user;
@@ -43,11 +43,11 @@ public class ProfilePicture {
         this.id = id;
     }
 
-    public byte[] getContent() {
-        return content;
+    public String getProfilePictureStoreLocation() {
+        return profilePictureStoreLocation;
     }
 
-    public void setContent(byte[] content) {
-        this.content = content;
+    public void setProfilePictureStoreLocation(String profilePictureStoreLocation) {
+        this.profilePictureStoreLocation = profilePictureStoreLocation;
     }
 }

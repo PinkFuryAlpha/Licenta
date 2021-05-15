@@ -15,4 +15,6 @@ public interface MediaService {
     InputStream getSong(Long songId) throws FileNotFoundException;
 
     void deleteSong(Long songId);
+
+    void deletePhoto(Long photoId);
 }
