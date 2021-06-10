@@ -14,8 +14,9 @@ public class SongToDto {
         streamDto.setId(song.getId());
         streamDto.setSongName(song.getSongName());
         streamDto.setGenre(song.getGenre());
-        streamDto.setViews(song.getViews() + 1);
+        streamDto.setViews(song.getViews());
         streamDto.setUpVotes(song.getUpVotes());
+        streamDto.setPhotoId(song.getSongCoverPhoto().getId());
 
         Set<String> artists = song.getArtists()
                 .stream()

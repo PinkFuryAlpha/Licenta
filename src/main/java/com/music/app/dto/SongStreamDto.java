@@ -9,13 +9,13 @@ public class SongStreamDto {
 
     private Genre genre;
 
-    private Double duration;
-
     private Long upVotes;
 
     private Long views;
 
     private Set<String> artists;
+
+    private Long photoId;
 
     public Long getId() {
         return id;
@@ -41,14 +41,6 @@ public class SongStreamDto {
         this.genre = genre;
     }
 
-    public Double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Double duration) {
-        this.duration = duration;
-    }
-
     public Long getUpVotes() {
         return upVotes;
     }
@@ -71,5 +63,13 @@ public class SongStreamDto {
 
     public void setArtists(Set<String> artists) {
         this.artists = artists;
+    }
+
+    public Long getPhotoId() {
+        return photoId;
+    }
+
+    public void setPhotoId(Long photoId) {
+        this.photoId = photoId;
     }
 }

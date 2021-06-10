@@ -13,6 +13,7 @@ import com.music.app.repo.SongRepository;
 import com.music.app.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +24,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class SongServiceImpl implements SongService {
@@ -117,14 +123,59 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
+    public Set<SongStreamDto> getUserSongs(String username) {
+        User user = userRepo.findByUsername(username);
+
+        Set<Song> allSongs = user.getSongsCreated();
+        Set<SongStreamDto> allSongsDto = new HashSet<>();
+
+        for (Song song : allSongs) {
+            allSongsDto.add(SongToDto.convertEntityToStreamDto(song));
+        }
+
+        return allSongsDto;
+    }
+
+    @Override
     public SongStreamDto getSong(Long songId) throws BusinessException {
         Song song = songRepository
                 .findById(songId)
                 .orElseThrow(() -> new BusinessException(404, "Song was not found, or probably deleted."));
 
-        songRepository.incrementViews(songId);
-
         return SongToDto.convertEntityToStreamDto(song);
+    }
+
+    @Override
+    public Page<SongStreamDto> getLikedSongsByUser(SongDto songDto, HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+        Sort sort = Sort.by(songDto.getSortDirection(), songDto.getSortBy());
+
+        Pageable pageable = PageRequest.of(songDto.getPageNumber(),
+                songDto.getPageSize(),
+                sort);
+
+        List<Song> likedSongs = new ArrayList<>(user.getLikedSongs());
+
+        Page<Song> songs = new PageImpl<Song>(likedSongs, pageable, user.getLikedSongs().size());
+
+        return songs.map(new Function<Song, SongStreamDto>() {
+            @Override
+            public SongStreamDto apply(Song song) {
+                return SongToDto.convertEntityToStreamDto(song);
+            }
+        });
+    }
+
+    @Override
+    public Boolean isSongLiked(Long songId, HttpServletRequest request) throws BusinessException {
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+        Song song = songRepository
+                .findById(songId)
+                .orElseThrow(() -> new BusinessException(404, "Song was not found, or probably deleted."));
+
+        return user.getLikedSongs().contains(song);
     }
 
     @Transactional
@@ -165,7 +216,7 @@ public class SongServiceImpl implements SongService {
     }
 
     @Transactional
-    public void deleteSong(Long songId,HttpServletRequest request) throws BusinessException {
+    public void deleteSong(Long songId, HttpServletRequest request) throws BusinessException {
         Principal principal = request.getUserPrincipal();
         User user = userRepo.findByUsername(principal.getName());
 
@@ -173,8 +224,8 @@ public class SongServiceImpl implements SongService {
                 .findById(songId)
                 .orElseThrow(() -> new BusinessException(404, "Song was not found, or probably deleted."));
 
-        if(!song.getArtists().contains(user)){
-            throw new BusinessException(401,"The user is not an contributor.");
+        if (!song.getArtists().contains(user)) {
+            throw new BusinessException(401, "The user is not an contributor.");
         }
 
         mediaService.deleteSong(songId);

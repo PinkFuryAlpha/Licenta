@@ -2,6 +2,8 @@ package com.music.app.service;
 
 import com.music.app.config.EmailConfiguration;
 import com.music.app.config.exception.BusinessException;
+import com.music.app.config.mapper.UserToDto;
+import com.music.app.dto.LoginDto;
 import com.music.app.dto.PasswordResetDto;
 import com.music.app.dto.UserLoginDTO;
 import com.music.app.dto.UserRegisterDTO;
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService {
     private String profilePhotoDirectory;
 
     @Override
-    public String login(UserLoginDTO userLoginDTO) throws BusinessException {
+    public LoginDto login(UserLoginDTO userLoginDTO) throws BusinessException {
 
         if (Objects.isNull(userLoginDTO)) {
             throw new BusinessException(401, "Body null !");
@@ -97,7 +99,11 @@ public class UserServiceImpl implements UserService {
 
         final UserDetails userDetails = loadUserByUsername(userLoginDTO.getUsername());
 
-        return jwtToken.generateToken(userDetails);
+        User user = userRepo.findByUsername(userLoginDTO.getUsername());
+
+        String jwt = jwtToken.generateToken(userDetails);
+
+        return UserToDto.convertEntityToLoginDto(user, jwt);
 
     }
 
@@ -153,13 +159,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findByUsername(principal.getName());
 
         Long id = 2L;
-        if(user.getProfilePicture() == null){
+        if (user.getProfilePicture() == null) {
             Photo photo = new Photo();
             photo.setUser(user);
             photo.setPhotoStoreLocation(mediaService.saveMedia(media, profilePhotoDirectory));
             user.setProfilePicture(photo);
-            id =photoRepository.save(photo).getId();
-        } else{
+            id = photoRepository.save(photo).getId();
+        } else {
             Photo photo = user.getProfilePicture();
             mediaService.deletePhoto(photo.getId());
             String newPhotoLocation = mediaService.saveMedia(media, profilePhotoDirectory);

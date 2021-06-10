@@ -1,6 +1,7 @@
 package com.music.app.service;
 
 import com.music.app.config.exception.BusinessException;
+import com.music.app.dto.LoginDto;
 import com.music.app.dto.PasswordResetDto;
 import com.music.app.dto.UserLoginDTO;
 import com.music.app.dto.UserRegisterDTO;
@@ -17,7 +18,7 @@ public interface UserService extends UserDetailsService {
 
     User confirmRegistration(String token) throws BusinessException;
 
-    String login(UserLoginDTO userLoginDTO) throws BusinessException;
+    LoginDto login(UserLoginDTO userLoginDTO) throws BusinessException;
 
     String forgotPassword(String email) throws BusinessException;
 

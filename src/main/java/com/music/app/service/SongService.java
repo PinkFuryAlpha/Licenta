@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 
 public interface SongService {
@@ -23,6 +24,11 @@ public interface SongService {
 
     void unlikeSong(Long songId, HttpServletRequest request) throws BusinessException;
 
-    void deleteSong(Long songId,HttpServletRequest request) throws BusinessException;
+    void deleteSong(Long songId, HttpServletRequest request) throws BusinessException;
 
+    Boolean isSongLiked(Long songId, HttpServletRequest request) throws BusinessException;
+
+    Page<SongStreamDto> getLikedSongsByUser(SongDto songDto, HttpServletRequest request);
+
+    Set<SongStreamDto> getUserSongs(String username);
 }

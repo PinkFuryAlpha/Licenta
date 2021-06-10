@@ -2,6 +2,7 @@ package com.music.app.controllers;
 
 import com.music.app.config.exception.BusinessException;
 import com.music.app.constraint.PhotoConstraint;
+import com.music.app.dto.LoginDto;
 import com.music.app.dto.PasswordResetDto;
 import com.music.app.dto.UserLoginDTO;
 import com.music.app.entity.Photo;
@@ -9,6 +10,7 @@ import com.music.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +38,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/authenticate")
-    public ResponseEntity<String> loginUser(@RequestBody final UserLoginDTO userLoginDTO) throws BusinessException {
+    public ResponseEntity<LoginDto> loginUser(@RequestBody final UserLoginDTO userLoginDTO) throws BusinessException {
         return ResponseEntity.ok(userService.login(userLoginDTO));
     }
 

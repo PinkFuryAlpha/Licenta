@@ -62,20 +62,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        http.cors().and().csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/register", "/users/authenticate", "/users/forgot-password", "/users/reset-password", "/songs", "/users/update-to-artist").permitAll()
-                .antMatchers(HttpMethod.GET, "/register/confirm-register","/media/**","/songs").permitAll()
+                .antMatchers(HttpMethod.GET, "/register/confirm-register", "/songs", "/media/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/hello", "/users/save-profile-image").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
-                .antMatchers(HttpMethod.POST, "/songs").hasAnyRole(ARTIST)
-                .antMatchers(HttpMethod.POST, "/songs/get-song","/songs/like","/songs/unLike").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
+                .antMatchers(HttpMethod.POST, "/songs/**").hasAnyRole(ARTIST)
+                .antMatchers(HttpMethod.POST, "/songs/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
+                .antMatchers(HttpMethod.GET, "/songs/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
                 .antMatchers(HttpMethod.DELETE, "/songs/delete").hasAnyRole(ARTIST)
-                .antMatchers(HttpMethod.POST,"/playlist/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
-                .antMatchers(HttpMethod.GET,"/playlist/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
+                .antMatchers(HttpMethod.POST, "/playlist/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
+                .antMatchers(HttpMethod.GET, "/playlist/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
 
                 .anyRequest()
                 .authenticated()

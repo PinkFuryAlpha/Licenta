@@ -17,4 +17,6 @@ public interface MediaService {
     void deletePhoto(Long photoId);
 
     FileSystemResource getPhoto(Long photoId);
+
+    public InputStream getImage(Long photoId) throws FileNotFoundException;
 }

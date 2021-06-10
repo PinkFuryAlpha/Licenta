@@ -45,6 +45,8 @@ public class MediaServiceImpl implements MediaService {
     public InputStream getSong(Long songId) throws FileNotFoundException {
         Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        songRepository.incrementViews(song.getId());
+
         return new FileInputStream(song.getMusicStoreLocation());
     }
 
@@ -60,6 +62,13 @@ public class MediaServiceImpl implements MediaService {
         Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
          return mediaRepository.fetchMedia(photo.getPhotoStoreLocation());
+    }
+
+    @Override
+    public InputStream getImage(Long photoId) throws FileNotFoundException {
+        Photo photo = photoRepository.findById(photoId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return new FileInputStream(photo.getPhotoStoreLocation());
     }
 
     @Override

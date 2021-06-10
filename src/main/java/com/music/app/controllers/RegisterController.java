@@ -14,6 +14,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping(path = "/register")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class RegisterController {
 
     private final UserService userService;
