@@ -69,11 +69,12 @@ public class User {
     @JsonBackReference
     private Set<Playlist> playlists;
 
-    public User(String firstName, String lastName, String username, String password, String email, Collection<Role> roles) {
+    public User(String firstName, String lastName, String username, String password, String email, Collection<Role> roles,Photo profilePicture) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        this.profilePicture=profilePicture;
         this.email = email;
         this.roles = roles;
         this.enabled = false;

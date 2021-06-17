@@ -191,12 +191,15 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(403, "The username is taken!");
         }
 
+        Photo profilePicture = photoRepository.findById(1L).orElse(null);
+
         user = new User(userRegisterDTO.getFirstName(),
                 userRegisterDTO.getLastName(),
                 userRegisterDTO.getUsername(),
                 bCryptPasswordEncoder.encode(userRegisterDTO.getPassword()),
                 userRegisterDTO.getEmail(),
-                roles);
+                roles,
+                profilePicture);
 
         long id = userRepo.save(user).getId();
 

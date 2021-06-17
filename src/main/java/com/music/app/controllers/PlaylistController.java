@@ -16,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/playlist")
@@ -44,6 +45,9 @@ public class PlaylistController {
     public ResponseEntity<PlaylistDto> getPlaylist(@RequestParam Long playlistId) throws BusinessException {
         return ResponseEntity.ok(playlistService.getPlaylist(playlistId));
     }
+
+    @GetMapping()
+    public Set<PlaylistDto> getAllUserPlaylists(HttpServletRequest request)
 
     @PostMapping( path = "/addSong")
     public ResponseEntity<String> addSongToPlayList(@RequestParam Long songId, @RequestParam Long playlistId, HttpServletRequest request) throws BusinessException {

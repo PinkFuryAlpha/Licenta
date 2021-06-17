@@ -12,9 +12,14 @@ public class UserToDto {
         loginDto.setLastName(user.getLastName());
         loginDto.setUsername(user.getUsername());
         //TODO: fix bug on login if user has no photo
-        loginDto.setPhotoId(1L);
+        if (user.getProfilePicture() == null) {
+            loginDto.setPhotoId(1L);
+        } else {
+            loginDto.setPhotoId(user.getProfilePicture().getId());
+        }
         loginDto.setJwtToken(jwt);
         loginDto.setRoles(user.getRoles());
+        loginDto.setEmail(user.getEmail());
 
         return loginDto;
     }

@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class PlaylistServiceImpl implements PlaylistService {
@@ -39,6 +43,22 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .orElseThrow(() -> new BusinessException(404, "Playlist not found"));
 
         return PlaylistToDto.convertEntityToPlaylistDto(playlist);
+    }
+
+    @Override
+    public Set<PlaylistDto> getAllUserPlaylists(HttpServletRequest request){
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+
+        Set<Playlist> userPlaylists= user.getPlaylists();
+        Set<PlaylistDto> response = new HashSet<>();
+
+        for (Playlist userPlaylist : userPlaylists) {
+            response.add(PlaylistToDto.convertEntityToPlaylistDto(userPlaylist));
+        }
+
+        return response;
+
     }
 
     @Override

@@ -11,9 +11,18 @@ public class LoginDto {
     private String firstName;
     private String lastName;
     private String username;
+    private String email;
     private Long photoId;
     private Collection<Role> roles;
     private String jwtToken;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public Long getId() {
         return id;

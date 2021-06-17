@@ -7,7 +7,6 @@ import java.util.Set;
 
 public class SongSaveDto {
 
-    @NameConstraint
     private String songName;
 
     private Genre genre;

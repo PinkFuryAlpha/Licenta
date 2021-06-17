@@ -49,26 +49,26 @@ public class UserController {
 
     @PostMapping(path = "/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam final String token, @RequestParam @Valid final PasswordResetDto password) throws BusinessException {
-        userService.resetPassword(token,password);
+        userService.resetPassword(token, password);
 
         return ResponseEntity.ok("User password updated!");
     }
 
     @PostMapping(path = "/save-profile-image")
-    public ResponseEntity<Photo> saveProfileImage(@RequestPart("file") @PhotoConstraint MultipartFile file, HttpServletRequest request) throws BusinessException, IOException {
-        long id = userService.saveProfilePicture(file,request);
+    public ResponseEntity<Long> saveProfileImage(@RequestPart("file") @PhotoConstraint MultipartFile file, HttpServletRequest request) throws BusinessException, IOException {
+        long id = userService.saveProfilePicture(file, request);
 
-        final URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(id)
-                .toUri();
+//        final URI location = ServletUriComponentsBuilder
+//                .fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(id)
+//                .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.ok(id);
     }
 
     @PostMapping(path = "/update-to-artist")
-    public ResponseEntity<String> updateUserRole(HttpServletRequest request){
+    public ResponseEntity<String> updateUserRole(HttpServletRequest request) {
         userService.updateUserToArtist(request);
 
         return ResponseEntity.ok("User updated to artist!");

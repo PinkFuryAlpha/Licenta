@@ -68,7 +68,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/register", "/users/authenticate", "/users/forgot-password", "/users/reset-password", "/songs", "/users/update-to-artist").permitAll()
+                .antMatchers(HttpMethod.POST, "/register", "/users/authenticate", "/users/forgot-password", "/users/reset-password", "/users/update-to-artist").permitAll()
                 .antMatchers(HttpMethod.GET, "/register/confirm-register", "/songs", "/media/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/hello", "/users/save-profile-image").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE)
                 .antMatchers(HttpMethod.POST, "/songs/**").hasAnyRole(ARTIST)
