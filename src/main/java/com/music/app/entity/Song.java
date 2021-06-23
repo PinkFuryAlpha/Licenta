@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.Set;
@@ -26,13 +27,13 @@ public class Song {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "song_name",nullable = false)
+    @Column(name = "song_name", nullable = false)
     private String songName;
 
-    @Column(name = "views",nullable = false)
+    @Column(name = "views", nullable = false)
     private Long views;
 
-    @Column(name = "music_genre",nullable = false)
+    @Column(name = "music_genre", nullable = false)
     private Genre genre;
 
     @Column(name = "upVotes")

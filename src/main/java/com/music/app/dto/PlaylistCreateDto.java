@@ -3,7 +3,7 @@ package com.music.app.dto;
 import com.music.app.constraint.NameConstraint;
 
 public class PlaylistCreateDto {
-    @NameConstraint
+
     private String name;
 
     public String getName() {

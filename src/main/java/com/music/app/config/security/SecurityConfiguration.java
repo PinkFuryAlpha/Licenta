@@ -74,7 +74,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/songs/**").hasAnyRole(ARTIST)
                 .antMatchers(HttpMethod.POST, "/songs/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
                 .antMatchers(HttpMethod.GET, "/songs/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
-                .antMatchers(HttpMethod.DELETE, "/songs/delete").hasAnyRole(ARTIST)
+                .antMatchers(HttpMethod.DELETE, "/songs/delete","/playlist/**").hasAnyRole(ARTIST)
                 .antMatchers(HttpMethod.POST, "/playlist/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
                 .antMatchers(HttpMethod.GET, "/playlist/**").hasAnyRole(ADMIN_ROLE, BASIC_USER_ROLE, ARTIST)
 

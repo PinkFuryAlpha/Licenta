@@ -16,4 +16,6 @@ public interface PlaylistService {
     void addSongToPlayList(Long songId, Long playlistId, HttpServletRequest request) throws BusinessException;
 
     Set<PlaylistDto> getAllUserPlaylists(HttpServletRequest request);
+
+    void deletePlaylist(HttpServletRequest request, Long playlistId);
 }

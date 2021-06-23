@@ -1,13 +1,17 @@
 package com.music.app.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -16,13 +20,13 @@ import java.util.Set;
 @Entity
 @Table
 public class Playlist {
-//TO DO: put visible boolean
+    //TO DO: put visible boolean
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "album_name",nullable = false)
+    @Column(name = "album_name", nullable = false)
     private String albumName;
 
     @ManyToMany(mappedBy = "playlists")
@@ -30,7 +34,7 @@ public class Playlist {
     private Set<Song> songs;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     @JsonManagedReference
     private User owner;
 

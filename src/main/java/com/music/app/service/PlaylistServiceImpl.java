@@ -12,6 +12,7 @@ import com.music.app.repo.SongRepository;
 import com.music.app.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -46,11 +47,11 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
-    public Set<PlaylistDto> getAllUserPlaylists(HttpServletRequest request){
+    public Set<PlaylistDto> getAllUserPlaylists(HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
         User user = userRepo.findByUsername(principal.getName());
 
-        Set<Playlist> userPlaylists= user.getPlaylists();
+        Set<Playlist> userPlaylists = user.getPlaylists();
         Set<PlaylistDto> response = new HashSet<>();
 
         for (Playlist userPlaylist : userPlaylists) {
@@ -62,7 +63,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
-    public Long createPlaylist(PlaylistCreateDto playlist, HttpServletRequest request){
+    public Long createPlaylist(PlaylistCreateDto playlist, HttpServletRequest request) {
         Playlist newPlaylist = new Playlist();
 
         Principal principal = request.getUserPrincipal();
@@ -75,8 +76,17 @@ public class PlaylistServiceImpl implements PlaylistService {
         return playlistRepository.save(newPlaylist).getId();
     }
 
+    @Override
+    public void deletePlaylist(HttpServletRequest request, Long playlistId) {
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+
+        playlistRepository.deletePlayList(user.getId(), playlistId);
+    }
+
     //TO DO add/remove song to playlist
     @Override
+    @Transactional
     public void addSongToPlayList(Long songId, Long playlistId, HttpServletRequest request) throws BusinessException {
         Principal principal = request.getUserPrincipal();
         User user = userRepo.findByUsername(principal.getName());
@@ -89,11 +99,17 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .findById(playlistId)
                 .orElseThrow(() -> new BusinessException(404, "Playlist was not found, or probably deleted."));
 
-        if(!playlist.getOwner().equals(user)){
-            throw new BusinessException(404,"The playlist doesn't belong to the user.");
+        if (!playlist.getOwner().equals(user)) {
+            throw new BusinessException(404, "The playlist doesn't belong to the user.");
         }
 
-        song.getPlaylists().add(playlist);
         playlist.getSongs().add(song);
+        song.getPlaylists().add(playlist);
+
+        playlistRepository.save(playlist);
+        songRepository.save(song);
+
     }
+
+
 }
