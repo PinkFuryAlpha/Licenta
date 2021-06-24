@@ -123,15 +123,13 @@ public class UserServiceImpl implements UserService {
         mailSender.setUsername(this.emailConfig.getUsername());
         mailSender.setPassword(this.emailConfig.getPassword());
 
-        String resetPasswordURL = "/users/reset-password?token=" + token.getToken();
-
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom("tinteanu.tudor@gmail.com");
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Reset Password!");
         mailMessage.setText("Music App! " +
                 "please click on the link bellow in order to reset your password:" + "\n" +
-                "http://localhost:8080" + resetPasswordURL);
+                "http://localhost:3000/password-reset" + "\n" +"Copy and paste the following code when you change password: " + token.getToken());
 
         mailSender.send(mailMessage);
 
