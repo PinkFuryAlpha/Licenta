@@ -103,13 +103,37 @@ public class PlaylistServiceImpl implements PlaylistService {
             throw new BusinessException(404, "The playlist doesn't belong to the user.");
         }
 
-        playlist.getSongs().add(song);
-        song.getPlaylists().add(playlist);
+        playlist.addSong(song);
 
         playlistRepository.save(playlist);
         songRepository.save(song);
 
     }
+
+    @Override
+    @Transactional
+    public void removeSongFromPlayList(Long songId, Long playlistId, HttpServletRequest request) throws BusinessException {
+        Principal principal = request.getUserPrincipal();
+        User user = userRepo.findByUsername(principal.getName());
+
+        Song song = songRepository
+                .findById(songId)
+                .orElseThrow(() -> new BusinessException(404, "Song was not found, or probably deleted."));
+
+        Playlist playlist = playlistRepository
+                .findById(playlistId)
+                .orElseThrow(() -> new BusinessException(404, "Playlist was not found, or probably deleted."));
+
+        if (!playlist.getOwner().equals(user)) {
+            throw new BusinessException(404, "The playlist doesn't belong to the user.");
+        }
+
+        playlist.removeSong(song);
+
+        playlistRepository.save(playlist);
+        //songRepository.save(song);
+    }
+
 
 
 }

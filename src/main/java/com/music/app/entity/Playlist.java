@@ -29,8 +29,17 @@ public class Playlist {
     @Column(name = "album_name", nullable = false)
     private String albumName;
 
-    @ManyToMany(mappedBy = "playlists")
-    @JsonManagedReference
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(
+            name = "playlists_songs",
+            joinColumns = @JoinColumn(
+                    name = "song_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "playlist_id", referencedColumnName = "id"))
+    @JsonBackReference
     private Set<Song> songs;
 
     @ManyToOne
@@ -68,5 +77,15 @@ public class Playlist {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public void addSong(Song song) {
+        songs.add(song);
+        song.getPlaylists().add(this);
+    }
+
+    public void removeSong(Song song) {
+        songs.remove(song);
+        song.getPlaylists().remove(this);
     }
 }

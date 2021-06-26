@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
         mailMessage.setSubject("Reset Password!");
         mailMessage.setText("Music App! " +
                 "please click on the link bellow in order to reset your password:" + "\n" +
-                "http://localhost:3000/password-reset" + "\n" +"Copy and paste the following code when you change password: " + token.getToken());
+                "http://localhost:3000/password-reset" + "\n" + "Copy and paste the following code when you change password: " + token.getToken());
 
         mailSender.send(mailMessage);
 
@@ -225,14 +225,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User confirmRegistration(String token) throws BusinessException {
+    public String confirmRegistration(String token) throws BusinessException {
         VerificationToken verificationToken = verificationTokenService.findByToken(token);
 
         if (verificationToken != null && verificationToken.getExpireAt().isAfter(LocalDateTime.now()) && verificationToken.getTokenType().equals("REGISTER")) {
             User user = userRepo.findByEmail(verificationTokenService.findByToken(token).getUser().getEmail());
             userRepo.enableUser(user.getEmail());
             verificationTokenService.removeToken(token);
-            return user;
+            return "<h1 style=\"display:flex;align-text:center\">User is activated</h1>";
         } else {
             throw new BusinessException(404, "Invalid, or expired link!");
         }

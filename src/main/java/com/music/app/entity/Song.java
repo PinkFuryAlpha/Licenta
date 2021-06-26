@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.Set;
@@ -54,14 +53,9 @@ public class Song {
     @JsonManagedReference
     private Set<User> usersWhoLiked;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(
-            name = "playlists_songs",
-            joinColumns = @JoinColumn(
-                    name ="song_id" , referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "playlist_id", referencedColumnName = "id"))
-    @JsonBackReference
+
+    @ManyToMany(mappedBy = "songs")
+    @JsonManagedReference
     private Set<Playlist> playlists;
 
     public Song() {

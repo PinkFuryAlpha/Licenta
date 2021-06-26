@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -16,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Service
 public class MediaServiceImpl implements MediaService {
@@ -51,10 +54,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
+    @Transactional
     public void deleteSong(Long songId) {
         Song song = songRepository.findById(songId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        mediaRepository.deleteMedia(song.getSongCoverPhoto().getPhotoStoreLocation());
         mediaRepository.deleteMedia(song.getMusicStoreLocation());
+        System.out.println();
+
     }
 
     @Override

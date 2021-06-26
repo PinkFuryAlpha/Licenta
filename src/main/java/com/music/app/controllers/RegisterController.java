@@ -38,7 +38,7 @@ public class RegisterController {
     }
 
     @GetMapping(path="/confirm-register")
-    public ResponseEntity<User> confirmAccount(@RequestParam final String token) throws BusinessException{
+    public ResponseEntity<String> confirmAccount(@RequestParam final String token) throws BusinessException{
         return ResponseEntity.ok(userService.confirmRegistration(token));
     }
 }

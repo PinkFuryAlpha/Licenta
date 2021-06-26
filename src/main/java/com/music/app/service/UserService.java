@@ -16,7 +16,7 @@ public interface UserService extends UserDetailsService {
 
     Long save(UserRegisterDTO userRegisterDTO) throws BusinessException;
 
-    User confirmRegistration(String token) throws BusinessException;
+    String confirmRegistration(String token) throws BusinessException;
 
     LoginDto login(UserLoginDTO userLoginDTO) throws BusinessException;
 

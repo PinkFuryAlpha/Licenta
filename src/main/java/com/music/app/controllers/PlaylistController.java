@@ -59,6 +59,12 @@ public class PlaylistController {
         return ResponseEntity.ok("Song added to playlist");
     }
 
+    @PostMapping(path = "/removeSong")
+    public ResponseEntity<String> removeSongFromPlayList(@RequestParam Long songId, @RequestParam Long playlistId, HttpServletRequest request) throws BusinessException {
+        playlistService.removeSongFromPlayList(songId, playlistId, request);
+        return ResponseEntity.ok("Song removed from playlist");
+    }
+
     @DeleteMapping
     public ResponseEntity<String> deletePlaylist(HttpServletRequest request,@RequestParam final Long playlistId) {
         playlistService.deletePlaylist(request,playlistId);
